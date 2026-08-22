@@ -115,7 +115,7 @@ it("shows edit form when edit button is clicked", async () => {
   renderWithProviders(<TransactieList />, {
     boekje: { ...defaultMockBoekje, transacties, activeBoekjeId: "boekje-1" },
   });
-  const editButton = screen.getByText("✎");
+  const editButton = screen.getByTitle("Bewerken");
   await user.click(editButton);
   expect(screen.getByText("Transactie bewerken")).toBeInTheDocument();
 });

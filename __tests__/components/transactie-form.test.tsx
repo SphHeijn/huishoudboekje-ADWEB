@@ -114,6 +114,42 @@ it("calls updateTransactie on valid submit in edit mode", async () => {
   expect(mockOnDone).toHaveBeenCalled();
 });
 
+it("calls updateTransactie with empty categoryId when removing category in edit mode", async () => {
+  const user = userEvent.setup();
+  const mockUpdateTransactie = jest.fn().mockResolvedValue(undefined);
+  const categorieen = [createMockCategorie({ id: "c1", name: "Boodschappen" })];
+  const transactie = createMockTransactie({
+    id: "t1",
+    type: "uitgave",
+    amount: 50,
+    categoryId: "c1",
+    date: "2026-05-15",
+    description: "Koffie",
+  });
+  renderWithProviders(
+    <TransactieForm onDone={mockOnDone} initial={transactie} />,
+    {
+      boekje: {
+        ...defaultMockBoekje,
+        activeBoekjeId: "boekje-1",
+        categorieen,
+        updateTransactie: mockUpdateTransactie,
+      },
+    }
+  );
+  await user.selectOptions(screen.getAllByRole("combobox")[1], "");
+  await user.click(screen.getByRole("button", { name: "Opslaan" }));
+  expect(mockUpdateTransactie).toHaveBeenCalledWith("boekje-1", "t1", {
+    boekjeId: "boekje-1",
+    type: "uitgave",
+    amount: 50,
+    categoryId: "",
+    date: "2026-05-15",
+    description: "Koffie",
+  });
+  expect(mockOnDone).toHaveBeenCalled();
+});
+
 it("shows validation error for invalid amount", async () => {
   const user = userEvent.setup();
   const categorieen = [createMockCategorie({ id: "c1", name: "Boodschappen" })];

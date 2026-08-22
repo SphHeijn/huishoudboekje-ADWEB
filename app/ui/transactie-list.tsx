@@ -57,6 +57,23 @@ function AnimatedNumber({ value, durationMs = 600 }: { value: number; durationMs
   return <span>{formatEur(displayValue)}</span>;
 }
 
+function IconPencil() {
+  return (
+    <svg
+      width="13"
+      height="13"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+    </svg>
+  );
+}
+
 export function TransactieList() {
   const { transacties, categorieen, deleteTransactie, activeBoekjeId, filterMonth } = useBoekjeContext();
   const [showForm, setShowForm] = useState(false);
@@ -161,8 +178,24 @@ export function TransactieList() {
                   <span style={{ fontSize: 13, fontWeight: 600, fontFamily: "var(--font-mono)", color: t.type === "inkomsten" ? "var(--success)" : "var(--foreground)", marginRight: 4 }}>
                     {t.type === "inkomsten" ? "+" : "-"}{formatEur(t.amount)}
                   </span>
-                  <button className="btn btn-ghost btn-sm" onClick={() => setEditing(t)} style={{ padding: "4px 6px", fontSize: 11 }}>✎</button>
-                  <button className="btn btn-ghost btn-sm" onClick={() => handleDelete(t)} style={{ padding: "4px 6px", fontSize: 11 }}>✕</button>
+                  <button
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => setEditing(t)}
+                    style={{ padding: "4px 6px", display: "inline-flex", alignItems: "center", justifyContent: "center" }}
+                    aria-label="Bewerken"
+                    title="Bewerken"
+                  >
+                    <IconPencil />
+                  </button>
+                  <button
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => handleDelete(t)}
+                    style={{ padding: "4px 6px", fontSize: 11 }}
+                    aria-label="Verwijderen"
+                    title="Verwijderen"
+                  >
+                    ✕
+                  </button>
                 </div>
               </motion.div>
             );

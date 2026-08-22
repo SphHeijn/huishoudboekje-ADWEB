@@ -38,9 +38,9 @@ export function TransactieForm({ onDone, initial }: Props) {
       boekjeId: activeBoekjeId,
       type,
       amount: Number(amount),
-      categoryId: categoryId || undefined,
+      categoryId: categoryId || (initial ? "" : undefined),
       date,
-      description: description || undefined,
+      description: description || (initial ? "" : undefined),
     });
     if (!parsed.success) {
       setError(parsed.error.issues[0].message);
