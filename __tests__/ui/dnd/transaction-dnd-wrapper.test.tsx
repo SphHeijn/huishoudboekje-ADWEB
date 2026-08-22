@@ -76,7 +76,7 @@ describe("TransactionDndWrapper", () => {
       activeBoekje: { id: "boekje-1", createdBy: "test-user-uid", members: ["test-user-uid"] },
     });
     render(<TransactionDndWrapper />);
-    expect(screen.getByText("Zonder categorie (2)")).toBeInTheDocument();
+    expect(screen.getByText("Geen categorie (2)")).toBeInTheDocument();
     expect(screen.getAllByText("Boodschappen").length).toBe(2);
     expect(screen.getByText("Vervoer")).toBeInTheDocument();
     expect(screen.getByText("Salaris")).toBeInTheDocument();

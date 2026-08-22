@@ -8,15 +8,14 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  useDroppable,
   type DragEndEvent,
   type DragStartEvent,
   type DragOverEvent,
 } from "@dnd-kit/core";
 import { useBoekjeContext } from "@/app/lib/contexts/boekje-context";
 import { useAuth } from "@/app/lib/contexts/auth-context";
-import { DraggableTransaction } from "@/app/ui/dnd/draggable-transaction";
 import { CategoryDropzone } from "@/app/ui/dnd/category-dropzone";
+import { UncategorizedDropzone } from "@/app/ui/dnd/uncategorized-dropzone";
 import { motion } from "motion/react";
 import { translateFirebaseError, formatEur } from "@/app/lib/format";
 import type { TransactieDoc, CategorieDoc } from "@/app/lib/schemas";
@@ -29,10 +28,6 @@ export function TransactionDndWrapper() {
   const [error, setError] = useState("");
 
   const isOwner = user?.uid === (activeBoekje?.createdBy ?? activeBoekje?.members[0]);
-
-  const { setNodeRef: uncategorizedRef, isOver: isOverUncategorized } = useDroppable({
-    id: "__uncategorized__",
-  });
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
@@ -82,14 +77,22 @@ export function TransactionDndWrapper() {
     const transactionId = active.id as string;
     const targetCategoryId = over.id as string;
     const tx = transacties.find((t) => t.id === transactionId);
-    if (tx?.categoryId === targetCategoryId) return;
+    if (!tx) return;
+
+    if (targetCategoryId === "__uncategorized__") {
+      if (!tx.categoryId) return;
+      try {
+        await updateTransactie(activeBoekjeId, transactionId, { categoryId: "" });
+      } catch (err) {
+        setError(translateFirebaseError(err));
+      }
+      return;
+    }
+
+    if (tx.categoryId === targetCategoryId) return;
 
     try {
-      if (targetCategoryId === "__uncategorized__") {
-        await updateTransactie(activeBoekjeId, transactionId, { categoryId: "" });
-      } else {
-        await updateTransactie(activeBoekjeId, transactionId, { categoryId: targetCategoryId });
-      }
+      await updateTransactie(activeBoekjeId, transactionId, { categoryId: targetCategoryId });
     } catch (err) {
       setError(translateFirebaseError(err));
     }
@@ -110,7 +113,7 @@ export function TransactionDndWrapper() {
       >
         <h3 style={{ fontFamily: "var(--font-mono)", fontSize: 14, fontWeight: 600, marginBottom: 2 }}>Slepen & Koppelen</h3>
         <p style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 16 }}>
-          Sleep een transactie naar een categorie om ze te koppelen.
+          Sleep een transactie naar een categorie om ze te koppelen, of naar &quot;Geen categorie&quot; om te ontkoppelen.
         </p>
 
         {!isOwner && (
@@ -126,34 +129,10 @@ export function TransactionDndWrapper() {
         )}
 
         {transacties.length > 0 && (
-          <div
-            ref={uncategorizedRef}
-            style={{
-              marginBottom: 20,
-              padding: "8px 12px",
-              border: `1px dashed ${isOverUncategorized ? "var(--primary)" : "var(--border)"}`,
-              borderRadius: "var(--radius-md)",
-              background: isOverUncategorized
-                ? "color-mix(in srgb, var(--primary) 8%, var(--surface))"
-                : "transparent",
-              transition: "background 0.15s, border-color 0.15s",
-            }}
-          >
-            <h4 style={{ fontSize: 11, fontWeight: 600, marginBottom: 6, color: "var(--text-secondary)", textTransform: "uppercase", fontFamily: "var(--font-mono)" }}>
-              Zonder categorie ({uncategorized.length})
-            </h4>
-            {uncategorized.length > 0 ? (
-              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                {uncategorized.map((t) => (
-                  <DraggableTransaction key={t.id} transaction={t} />
-                ))}
-              </div>
-            ) : (
-              <p style={{ fontSize: 12, color: "var(--text-secondary)", margin: 0 }}>
-                Sleep een transactie hierheen om de categorie te verwijderen
-              </p>
-            )}
-          </div>
+          <UncategorizedDropzone
+            transacties={uncategorized}
+            isOver={overCategoryId === "__uncategorized__"}
+          />
         )}
 
         {groupedByCategory.length === 0 ? (
