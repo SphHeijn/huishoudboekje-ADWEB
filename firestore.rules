@@ -1,0 +1,89 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ========================================
+    // Users Profile
+    // ========================================
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // ========================================
+    // Huishoudboekjes
+    // ========================================
+    match /huishoudboekjes/{boekjeId} {
+
+      // Alleen leden kunnen lezen
+      allow get: if request.auth != null
+                  && request.auth.uid in resource.data.members;
+      allow list: if request.auth != null
+                  && resource.data.members.hasAny([request.auth.uid]);
+
+      // Aanmaken: de maker wordt het eerste lid
+      allow create: if request.auth != null
+                    && request.resource.data.members[0] == request.auth.uid
+                    && request.resource.data.members.size() == 1;
+
+      // Alleen de eigenaar kan bijwerken
+      allow update: if request.auth != null
+                    && request.auth.uid == resource.data.createdBy;
+
+      // Alleen de eigenaar kan verwijderen
+      allow delete: if request.auth != null
+                    && request.auth.uid == resource.data.createdBy;
+
+      // ========================================
+      // Categorieën (subcollectie per boekje)
+      // ========================================
+      match /categorieen/{categorieId} {
+        allow read: if request.auth != null
+                    && request.auth.uid in get(
+                      /databases/$(database)/documents/huishoudboekjes/$(boekjeId)
+                    ).data.members;
+
+        allow create: if request.auth != null
+                      && request.auth.uid == get(
+                        /databases/$(database)/documents/huishoudboekjes/$(boekjeId)
+                      ).data.createdBy;
+
+        allow update: if request.auth != null
+                      && request.auth.uid == get(
+                        /databases/$(database)/documents/huishoudboekjes/$(boekjeId)
+                      ).data.createdBy;
+
+        allow delete: if request.auth != null
+                      && request.auth.uid == get(
+                        /databases/$(database)/documents/huishoudboekjes/$(boekjeId)
+                      ).data.createdBy;
+      }
+
+      // ========================================
+      // Transacties (subcollectie per boekje)
+      // ========================================
+      match /transacties/{transactieId} {
+        allow read: if request.auth != null
+                    && request.auth.uid in get(
+                      /databases/$(database)/documents/huishoudboekjes/$(boekjeId)
+                    ).data.members;
+
+        allow create: if request.auth != null
+                      && request.auth.uid == get(
+                        /databases/$(database)/documents/huishoudboekjes/$(boekjeId)
+                      ).data.createdBy;
+
+        allow update: if request.auth != null
+                      && request.auth.uid == get(
+                        /databases/$(database)/documents/huishoudboekjes/$(boekjeId)
+                      ).data.createdBy;
+
+        allow delete: if request.auth != null
+                      && request.auth.uid == get(
+                        /databases/$(database)/documents/huishoudboekjes/$(boekjeId)
+                      ).data.createdBy;
+      }
+    }
+  }
+}
