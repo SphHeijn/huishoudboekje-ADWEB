@@ -105,23 +105,26 @@ describe("BoekjeDetailPage", () => {
     });
   });
 
-  it("renders boekje title and description", () => {
+  it("renders boekje title and description", async () => {
     render(<BoekjeDetailPage />);
     expect(screen.getByText("Test Boekje")).toBeInTheDocument();
     expect(screen.getByText("A test")).toBeInTheDocument();
+    await waitFor(() => expect(getUserEmails).toHaveBeenCalled());
   });
 
-  it("renders all four tabs", () => {
+  it("renders all four tabs", async () => {
     render(<BoekjeDetailPage />);
     expect(screen.getByText("Transacties")).toBeInTheDocument();
     expect(screen.getByText("Categorieën")).toBeInTheDocument();
     expect(screen.getByText("Grafieken")).toBeInTheDocument();
     expect(screen.getByText("Slepen & Koppelen")).toBeInTheDocument();
+    await waitFor(() => expect(getUserEmails).toHaveBeenCalled());
   });
 
-  it("shows Transacties content by default", () => {
+  it("shows Transacties content by default", async () => {
     render(<BoekjeDetailPage />);
     expect(screen.getByText("Nog geen transacties")).toBeInTheDocument();
+    await waitFor(() => expect(getUserEmails).toHaveBeenCalled());
   });
 
   it("switches to Categorieën tab", async () => {
@@ -165,7 +168,7 @@ describe("BoekjeDetailPage", () => {
     expect(mockSetFilterMonth).toHaveBeenCalledWith("2026-04");
   });
 
-  it("does not render description when not provided", () => {
+  it("does not render description when not provided", async () => {
     mockUseBoekjeContext.mockReturnValue({
       activeBoekje: { id: "boekje-1", title: "No desc", currency: "EUR", members: ["test-user-uid"] },
       activeBoekjeId: "boekje-1",
@@ -191,6 +194,7 @@ describe("BoekjeDetailPage", () => {
     });
     render(<BoekjeDetailPage />);
     expect(screen.getByText("No desc")).toBeInTheDocument();
+    await waitFor(() => expect(getUserEmails).toHaveBeenCalled());
   });
 
   it("shows gearchiveerd message when boekje is archived", async () => {
@@ -219,6 +223,7 @@ describe("BoekjeDetailPage", () => {
     });
     render(<BoekjeDetailPage />);
     expect(screen.getByText("Boekje is gearchiveerd")).toBeInTheDocument();
+    await waitFor(() => expect(getUserEmails).toHaveBeenCalled());
   });
 
   it("shows geen toegang message when user is not a member", async () => {
@@ -247,6 +252,7 @@ describe("BoekjeDetailPage", () => {
     });
     render(<BoekjeDetailPage />);
     expect(screen.getByText("Geen toegang")).toBeInTheDocument();
+    await waitFor(() => expect(getUserEmails).toHaveBeenCalled());
   });
 
   it("renders participants tab and handles invitations and member removal", async () => {

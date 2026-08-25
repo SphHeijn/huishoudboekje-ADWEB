@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, act } from "@testing-library/react";
 import { BoekjeProvider, useBoekjeContext } from "@/app/lib/contexts/boekje-context";
 import { useBoekjes } from "@/app/lib/hooks/use-boekjes";
 import { useTransacties } from "@/app/lib/hooks/use-transacties";
@@ -95,7 +95,9 @@ it("provides data from hooks", () => {
 
 it("setActiveBoekje updates state", async () => {
   renderWithProviders(<TestConsumer />);
-  screen.getByTestId("set-active").click();
+  await act(async () => {
+    screen.getByTestId("set-active").click();
+  });
   await waitFor(() => {
     expect(screen.getByTestId("active-id").textContent).toBe("b1");
   });
@@ -104,31 +106,49 @@ it("setActiveBoekje updates state", async () => {
 it("calls service methods", async () => {
   renderWithProviders(<TestConsumer />);
 
-  screen.getByTestId("create-boekje").click();
+  await act(async () => {
+    screen.getByTestId("create-boekje").click();
+  });
   expect(mockCreateBoekjeService).toHaveBeenCalled();
 
-  screen.getByTestId("delete-boekje").click();
+  await act(async () => {
+    screen.getByTestId("delete-boekje").click();
+  });
   expect(mockDeleteBoekjeService).toHaveBeenCalledWith("b1");
 
-  screen.getByTestId("update-boekje").click();
+  await act(async () => {
+    screen.getByTestId("update-boekje").click();
+  });
   expect(mockUpdateBoekjeService).toHaveBeenCalledWith("b1", { title: "Updated" });
 
-  screen.getByTestId("create-transactie").click();
+  await act(async () => {
+    screen.getByTestId("create-transactie").click();
+  });
   expect(mockCreateTransactieService).toHaveBeenCalled();
 
-  screen.getByTestId("update-transactie").click();
+  await act(async () => {
+    screen.getByTestId("update-transactie").click();
+  });
   expect(mockUpdateTransactieService).toHaveBeenCalledWith("b1", "t1", { amount: 20 });
 
-  screen.getByTestId("delete-transactie").click();
+  await act(async () => {
+    screen.getByTestId("delete-transactie").click();
+  });
   expect(mockDeleteTransactieService).toHaveBeenCalledWith("b1", "t1");
 
-  screen.getByTestId("create-categorie").click();
+  await act(async () => {
+    screen.getByTestId("create-categorie").click();
+  });
   expect(mockCreateCategorieService).toHaveBeenCalled();
 
-  screen.getByTestId("update-categorie").click();
+  await act(async () => {
+    screen.getByTestId("update-categorie").click();
+  });
   expect(mockUpdateCategorieService).toHaveBeenCalledWith("b1", "c1", { name: "Renamed" });
 
-  screen.getByTestId("delete-categorie").click();
+  await act(async () => {
+    screen.getByTestId("delete-categorie").click();
+  });
   expect(mockDeleteCategorieService).toHaveBeenCalledWith("b1", "c1");
 });
 

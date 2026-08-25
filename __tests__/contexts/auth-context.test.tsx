@@ -69,9 +69,7 @@ it("sets user when onAuthStateChanged fires with a user", async () => {
   const mockUnsubscribe = jest.fn();
   const mockFirebaseUser = { uid: "uid-1", email: "test@example.com" };
   mockOnAuthStateChanged.mockImplementation((_auth: unknown, cb: (user: unknown) => void) => {
-    act(() => {
-      cb(mockFirebaseUser);
-    });
+    cb(mockFirebaseUser);
     return mockUnsubscribe;
   });
   renderWithAuth(<TestConsumer />);

@@ -43,9 +43,7 @@ it("subscribes to Firestore when userId is provided", () => {
   const mockUnsubscribe = jest.fn();
   mockOnSnapshot.mockImplementation(
     (_q: unknown, onData: (snapshot: unknown) => void) => {
-      act(() => {
-        onData({ docs: [], forEach: () => {} });
-      });
+      onData({ docs: [], forEach: () => {} });
       return mockUnsubscribe;
     }
   );
@@ -58,9 +56,7 @@ it("sets loading to false after data arrives", async () => {
   const mockUnsubscribe = jest.fn();
   mockOnSnapshot.mockImplementation(
     (_q: unknown, onData: (snapshot: unknown) => void) => {
-      act(() => {
-        onData({ docs: [], forEach: () => {} });
-      });
+      onData({ docs: [], forEach: () => {} });
       return mockUnsubscribe;
     }
   );
@@ -79,9 +75,7 @@ it("does not show error for permission-denied onSnapshot failure", async () => {
       _onData: (snapshot: unknown) => void,
       onError: (err: { message: string }) => void
     ) => {
-      act(() => {
-        onError({ message: "Missing or insufficient permissions" });
-      });
+      onError({ message: "Missing or insufficient permissions" });
       return mockUnsubscribe;
     }
   );
@@ -89,7 +83,7 @@ it("does not show error for permission-denied onSnapshot failure", async () => {
 
   // Exhaust all retries (MAX_RETRIES = 3)
   for (let i = 0; i < 3; i++) {
-    act(() => {
+    await act(async () => {
       jest.advanceTimersByTime(2000);
     });
   }
@@ -111,21 +105,19 @@ it("retries on permission error and succeeds on retry", async () => {
       onData: (snapshot: unknown) => void,
       onError: (err: { message: string }) => void
     ) => {
-      act(() => {
-        callCount++;
-        if (callCount === 1) {
-          onError({ message: "Missing or insufficient permissions" });
-        } else {
-          onData({ docs: [], forEach: () => {} });
-        }
-      });
+      callCount++;
+      if (callCount === 1) {
+        onError({ message: "Missing or insufficient permissions" });
+      } else {
+        onData({ docs: [], forEach: () => {} });
+      }
       return mockUnsubscribe;
     }
   );
   render(<TestComponent userId="user-1" />);
 
   // First attempt failed, retry is scheduled
-  act(() => {
+  await act(async () => {
     jest.advanceTimersByTime(2000);
   });
 
@@ -141,9 +133,7 @@ it("unsubscribes on unmount", () => {
   const mockUnsubscribe = jest.fn();
   mockOnSnapshot.mockImplementation(
     (_q: unknown, onData: (snapshot: unknown) => void) => {
-      act(() => {
-        onData({ docs: [], forEach: () => {} });
-      });
+      onData({ docs: [], forEach: () => {} });
       return mockUnsubscribe;
     }
   );

@@ -53,9 +53,7 @@ it("subscribes when boekjeId is provided", () => {
   const mockUnsubscribe = jest.fn();
   mockOnSnapshot.mockImplementation(
     (_q: unknown, onData: (snapshot: unknown) => void) => {
-      act(() => {
-        onData({ docs: [], forEach: () => {} });
-      });
+      onData({ docs: [], forEach: () => {} });
       return mockUnsubscribe;
     }
   );
