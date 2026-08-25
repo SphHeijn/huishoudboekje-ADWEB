@@ -328,5 +328,12 @@ describe("BoekjeDetailPage", () => {
       });
     });
   });
+
+  it("resets active boekje to null on unmount", () => {
+    const { unmount } = render(<BoekjeDetailPage />);
+    unmount();
+    expect(mockSetActiveBoekje).toHaveBeenCalledWith(null);
+  });
 });
+
 

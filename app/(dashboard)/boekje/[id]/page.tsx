@@ -48,6 +48,9 @@ export default function BoekjeDetailPage() {
     if (activeBoekje?.id !== id) {
       setActiveBoekje(id);
     }
+    return () => {
+      setActiveBoekje(null);
+    };
   }, [id, activeBoekje?.id, setActiveBoekje]);
 
   useEffect(() => {

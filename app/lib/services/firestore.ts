@@ -1,5 +1,6 @@
 "use client";
 
+import { Observable } from "rxjs";
 import {
   collection,
   doc,
@@ -63,8 +64,6 @@ function getMonthRange(filterMonth: string): { start: string; end: string } {
 }
 
 // ───── Boekjes ─────
-
-import { Observable } from "rxjs";
 
 export function subscribeBoekjes(userId: string): Observable<BoekjeDoc[]> {
   return new Observable((subscriber) => {
